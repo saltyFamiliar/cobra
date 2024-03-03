@@ -24,6 +24,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -697,31 +698,23 @@ func (c *Command) argsMinusFirstX(args []string, x string) []string {
 	c.mergePersistentFlags()
 	flags := c.Flags()
 
-Loop:
 	for pos := 0; pos < len(args); pos++ {
 		s := args[pos]
-		switch {
-		case s == "--":
-			// -- means we have reached the end of the parseable args. Break out of the loop now.
-			break Loop
-		case strings.HasPrefix(s, "--") && !strings.Contains(s, "=") && !hasNoOptDefVal(s[2:], flags):
-			fallthrough
-		case strings.HasPrefix(s, "-") && !strings.Contains(s, "=") && len(s) == 2 && !shortHasNoOptDefVal(s[1:], flags):
-			// This is a flag without a default value, and an equal sign is not used. Increment pos in order to skip
-			// over the next arg, because that is the value of this flag.
+		if s == "--" {
+			break
+		}
+
+		if !strings.Contains(s, "=") &&
+			(isLongFlag(s) && !hasNoOptDefVal(s[2:], flags)) ||
+			(isShortFlag(s) && len(s) == 2 && !shortHasNoOptDefVal(s[1:], flags)) {
 			pos++
-			continue
-		case !strings.HasPrefix(s, "-"):
-			// This is not a flag or a flag value. Check to see if it matches what we're looking for, and if so,
-			// return the args, excluding the one at this position.
+		} else if !isFlag(s) {
 			if s == x {
-				ret := make([]string, 0, len(args)-1)
-				ret = append(ret, args[:pos]...)
-				ret = append(ret, args[pos+1:]...)
-				return ret
+				return slices.Delete(slices.Clone(args), pos, pos+1)
 			}
 		}
 	}
+
 	return args
 }
 
