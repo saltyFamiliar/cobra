@@ -2024,7 +2024,8 @@ func TestWrongGroupForCompletion(t *testing.T) {
 
 func TestSetOutput(t *testing.T) {
 	c := &Command{}
-	c.SetOutput(nil)
+	c.SetOut(nil)
+	c.SetErr(nil)
 	if out := c.OutOrStdout(); out != os.Stdout {
 		t.Errorf("Expected setting output to nil to revert back to stdout")
 	}
