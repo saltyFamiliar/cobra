@@ -663,28 +663,23 @@ func stripFlags(args []string, c *Command) []string {
 	commands := []string{}
 	flags := c.Flags()
 
-Loop:
 	for len(args) > 0 {
 		s := args[0]
 		args = args[1:]
-		switch {
-		case s == "--":
-			// "--" terminates the flags
-			break Loop
-		case strings.HasPrefix(s, "--") && !strings.Contains(s, "=") && !hasNoOptDefVal(s[2:], flags):
-			// If '--flag arg' then
-			// delete arg from args.
-			fallthrough // (do the same as below)
-		case strings.HasPrefix(s, "-") && !strings.Contains(s, "=") && len(s) == 2 && !shortHasNoOptDefVal(s[1:], flags):
-			// If '-f arg' then
-			// delete 'arg' from args or break the loop if len(args) <= 1.
+
+		if s == "--" {
+			break
+		} else if s == "" || strings.Contains(s, "=") {
+			continue
+		}
+
+		if (isLongFlag(s) && !hasNoOptDefVal(s[2:], flags)) ||
+			(isShortFlag(s) && len(s) == 2 && !shortHasNoOptDefVal(s[1:], flags)) {
 			if len(args) <= 1 {
-				break Loop
-			} else {
-				args = args[1:]
-				continue
+				break
 			}
-		case s != "" && !strings.HasPrefix(s, "-"):
+			args = args[1:]
+		} else if !isFlag(s) {
 			commands = append(commands, s)
 		}
 	}
