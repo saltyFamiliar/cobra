@@ -635,7 +635,7 @@ func checkIfFlagCompletion(finalCmd *Command, args []string, lastArg string) (*p
 	if len(flagName) == 0 {
 		if len(args) > 0 {
 			prevArg := args[len(args)-1]
-			if isFlagArg(prevArg) {
+			if isFlag(prevArg) {
 				// Only consider the case where the flag does not contain an =.
 				// If the flag contains an = it means it has already been fully processed,
 				// so we don't need to deal with it here.

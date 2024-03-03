@@ -642,6 +642,18 @@ func shortHasNoOptDefVal(name string, fs *flag.FlagSet) bool {
 	return flag.NoOptDefVal != ""
 }
 
+func isFlag(s string) bool {
+	return strings.HasPrefix(s, "-")
+}
+
+func isLongFlag(s string) bool {
+	return strings.HasPrefix(s, "--")
+}
+
+func isShortFlag(s string) bool {
+	return strings.HasPrefix(s, "-") && !strings.HasPrefix(s, "--")
+}
+
 func stripFlags(args []string, c *Command) []string {
 	if len(args) == 0 {
 		return args
@@ -716,11 +728,6 @@ Loop:
 		}
 	}
 	return args
-}
-
-func isFlagArg(arg string) bool {
-	return ((len(arg) >= 3 && arg[0:2] == "--") ||
-		(len(arg) >= 2 && arg[0] == '-' && arg[1] != '-'))
 }
 
 // Find the target command given the args and command tree
@@ -812,7 +819,7 @@ func (c *Command) Traverse(args []string) (*Command, []string, error) {
 			flags = append(flags, arg)
 			continue
 		// A flag without a value, or with an `=` separated value
-		case isFlagArg(arg):
+		case isFlag(arg):
 			flags = append(flags, arg)
 			continue
 		}
