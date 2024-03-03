@@ -616,11 +616,11 @@ func (c *Command) ErrPrefix() string {
 }
 
 func hasNoOptDefVal(name string, fs *flag.FlagSet) bool {
-	flag := fs.Lookup(name)
-	if flag == nil {
+	flag_ := fs.Lookup(name)
+	if flag_ == nil {
 		return false
 	}
-	return flag.NoOptDefVal != ""
+	return flag_.NoOptDefVal != ""
 }
 
 func shortHasNoOptDefVal(name string, fs *flag.FlagSet) bool {
@@ -628,11 +628,11 @@ func shortHasNoOptDefVal(name string, fs *flag.FlagSet) bool {
 		return false
 	}
 
-	flag := fs.ShorthandLookup(name[:1])
-	if flag == nil {
+	flag_ := fs.ShorthandLookup(name[:1])
+	if flag_ == nil {
 		return false
 	}
-	return flag.NoOptDefVal != ""
+	return flag_.NoOptDefVal != ""
 }
 
 func isFlag(s string) bool {
